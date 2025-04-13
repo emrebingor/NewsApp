@@ -23,6 +23,11 @@ struct ContentView: View {
                         }
                     
                     ExploreView()
+                        .onAppear {
+                            Task {
+                                await viewModel.getUser()
+                            }
+                        }
                         .tabItem {
                             Text("Explore")
                             Image(systemName: "eye.fill")

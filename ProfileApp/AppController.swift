@@ -40,8 +40,8 @@ final class AuthViewModel: ObservableObject {
                     email: email,
                     lastName: lastName,
                     news: [],
-                    followers: 0,
-                    following: 0,
+                    followers: [],
+                    following: [],
                 )
                 let encodedUser = try Firestore.Encoder().encode(user)
                 try await Firestore.firestore().collection("users").document(result.user.uid).setData(encodedUser)

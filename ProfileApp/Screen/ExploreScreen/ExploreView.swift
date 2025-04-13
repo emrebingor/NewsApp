@@ -10,10 +10,10 @@ import SwiftUI
 struct ExploreView: View {
     
     @StateObject var viewModel = ExploreViewModel()
-    
-    
-    
+    @EnvironmentObject var authViewModel: AuthViewModel
+
     var body: some View {
+
         NavigationView {
             VStack {
                 TextField("Search", text: $viewModel.userName)
@@ -22,14 +22,15 @@ struct ExploreView: View {
                     .keyboardType(.emailAddress)
                     .submitLabel(.done)
                 
+                
                 Spacer().frame(height: 30)
                 
                 ScrollView {
-                    ForEach(viewModel.userList, id: \.id) { user in
+                    ForEach(viewModel.filteredItems, id: \.id) { user in
                         VStack() {
                             HStack {
                                 Image(systemName: user.image)
-                                Text(user.name + user.lastName)
+                                Text(user.name + " " + user.lastName)
                                 Spacer()
                                 Image(systemName: "chevron.right")
                             }
@@ -45,8 +46,12 @@ struct ExploreView: View {
             .padding()
             .navigationTitle("Explore")
         }
-        .sheet(isPresented: $viewModel.isDetailActive) {
-            UserDetailView(viewModel: UserDetailViewModel(user: viewModel.selectedUser!, isDetailActive: $viewModel.isDetailActive))
+        .fullScreenCover(isPresented: $viewModel.isDetailActive) {
+            UserDetailView(viewModel: UserDetailViewModel(
+                user: viewModel.selectedUser!,
+                currentUser: authViewModel.currentUser!,
+                isDetailActive: $viewModel.isDetailActive
+            ))
         }
         .onAppear {
             viewModel.getSearchUser()

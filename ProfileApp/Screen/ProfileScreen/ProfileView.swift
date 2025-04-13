@@ -39,8 +39,8 @@ struct ProfileView: View {
                     }
 
                     HStack(spacing: 30) {
-                        FollowInformationText(title: "Follower", number: viewModel.user.followers)
-                        FollowInformationText(title: "Following", number: viewModel.user.following)
+                        FollowInformationText(title: "Followers", number: viewModel.user.followers.count)
+                        FollowInformationText(title: "Followings", number: viewModel.user.following.count)
                     }
                     
                     Spacer().frame(height: 30)
@@ -77,24 +77,40 @@ struct ProfileView: View {
                     Spacer().frame(height: 20)
 
                     if(!viewModel.user.news.isEmpty) {
-                        ForEach(viewModel.user.news, id: \.id) { news in
-                            HStack {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    Text(news.title)
-                                        .lineLimit(1)
-                                        .bold()
-                                    Text(news.description)
-                                        .lineLimit(2)
-                                        .font(.caption)
+                        
+                            ForEach(viewModel.user.news, id: \.id) { news in
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text(news.title)
+                                            .lineLimit(1)
+                                            .bold()
+                                        Text(news.description)
+                                            .lineLimit(2)
+                                            .font(.caption)
+                                    }
+                                    Spacer()
+                                    
+                                    Text("See Details")
+                                        .frame(width: 60, height: 20)
+                                        .padding(.all, 4)
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(.black, lineWidth: 1)
+                                        )
                                 }
-                                Spacer()
+                                .onTapGesture {
+                                    viewModel.isDetailActive = true
+                                    viewModel.selectedNews = news
+                                }
+                                .padding()
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(.black, lineWidth: 1)
+                                )
                             }
-                            .padding()
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(.black, lineWidth: 1)
-                            )
-                        }
+                        
                     }
                     Spacer()
                 }
@@ -103,6 +119,9 @@ struct ProfileView: View {
 
             .padding()
             .navigationTitle("Profile")
+        }
+        .sheet(isPresented: $viewModel.isDetailActive) {
+            NewsDetailScreen(viewModel: NewsDetailViewModel(news: viewModel.selectedNews!, isDetailActive: $viewModel.isDetailActive))
         }
         .onChange(of: viewModel.imageSelection) { newItem in
             viewModel.setImage(data: newItem)
@@ -129,5 +148,6 @@ struct FollowInformationText: View {
             Text("\(number)")
                 .font(.title3)
         }
+        .foregroundColor(.black)
     }
 }
